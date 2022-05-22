@@ -81,7 +81,6 @@ public class EnemyActionController : MonoBehaviour
         {
             var direction = _thisEnemy.targetHero.transform.position - transform.position;
             _rigidbody2D.AddForce(direction.normalized * _thisEnemy._attackVelocity, ForceMode2D.Impulse);
-            Invoke("RestartAttack", 2f);
         }
         else if (_thisEnemy.isShooter)
         {

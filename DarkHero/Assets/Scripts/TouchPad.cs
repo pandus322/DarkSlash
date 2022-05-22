@@ -9,12 +9,28 @@ public class TouchPad : MonoBehaviour, IEndDragHandler, IPointerDownHandler, IDr
     private Vector2 _origin;
     private Vector2 _directionDrag;
     private Vector2 _directionTouch;
+    public Hero hero;
+    private Rigidbody2D _heroRigidbody2D;
     public bool isDragging { get; private set; }
-    public bool isOnPointerUp { get; private set; }
+    private bool isTouch;
 
+    public void Awake()
+    {
+        hero = FindObjectOfType<Hero>();
+        _heroRigidbody2D = hero.GetComponent<Rigidbody2D>();
+        _directionDrag = Vector2.zero;
+        isDragging = false;
+    }
+    private void Update()
+    {
+        if (_heroRigidbody2D.velocity.magnitude <= 1)
+        {
+            hero.isAttack = false;
+            //_heroRigidbody2D.velocity = Vector2.zero;
+        }
+    }
     public void OnDrag(PointerEventData eventData)
     {
-        isOnPointerUp = false;
         _directionTouch = Vector2.zero;
         isDragging = true;
         Vector2 curentPosition = eventData.position;
@@ -22,15 +38,14 @@ public class TouchPad : MonoBehaviour, IEndDragHandler, IPointerDownHandler, IDr
         _directionDrag = directionRaw.normalized;
     }
 
+    private void FixedUpdate()
+    {
+        if (isDragging)
+            Moove(GetDirectionDrag());
+    }
     public void OnEndDrag(PointerEventData eventData)
     {
         isDragging = false;
-        isOnPointerUp = false;
-        _directionDrag = Vector2.zero;
-    }
-
-    private void Awake()
-    {
         _directionDrag = Vector2.zero;
     }
 
@@ -47,7 +62,6 @@ public class TouchPad : MonoBehaviour, IEndDragHandler, IPointerDownHandler, IDr
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        isOnPointerUp = false;
         _directionTouch = Vector2.zero;
         _origin = eventData.position;
         _directionTouch =  Camera.main.ScreenToWorldPoint(Input.touches[0].position);
@@ -56,15 +70,36 @@ public class TouchPad : MonoBehaviour, IEndDragHandler, IPointerDownHandler, IDr
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        isOnPointerUp = true;
+
         _directionDrag = Vector2.zero;
-        Invoke("ResetDirection", 0.06f);
+        if (!isDragging)
+        {
+            hero.isAttack = true;
+            Attac(GetDirectionTouch());
+        }
+    }
+    public void Moove(Vector2 dir)
+    {
+        Rotation(dir);
+        _heroRigidbody2D.AddForce(dir * hero.speed * Time.fixedDeltaTime, ForceMode2D.Impulse);
     }
 
-    private void ResetDirection()
+    public void Attac(Vector3 dir)
     {
-        isOnPointerUp = false;
-        isDragging = false;
-        _directionTouch = Vector2.zero;
+        var direction = dir - hero.transform.position;
+        _heroRigidbody2D.AddForce(direction.normalized * hero.distanceAtack, ForceMode2D.Impulse);
+    }
+
+    private float _speedRotate = 5f;
+    public int rotationOffset = -90;
+    private float rotZ;
+
+    private void Rotation(Vector3 dir)
+    {
+        Vector3 difference = dir - transform.position;
+        rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
+
+        Quaternion rotation = Quaternion.AngleAxis(rotZ + rotationOffset, Vector3.forward);
+        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * _speedRotate);
     }
 }

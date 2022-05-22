@@ -20,7 +20,13 @@ public class Projectile : MonoBehaviour
         directionn = _heroTarget.transform.position - transform.position;
         Destroy(gameObject, _timeLife);
     }
-
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.GetComponent<Hero>() is Hero && _heroTarget.isAttack)
+        {
+            Die();
+        }
+    }
     // Update is called once per frame
     private void FixedUpdate()
     {
@@ -30,5 +36,9 @@ public class Projectile : MonoBehaviour
     private void Moove()
     {
         _rigidbody2D.AddForce(directionn.normalized * _speed, ForceMode2D.Impulse);
+    }
+    public void Die()
+    {
+        Destroy(gameObject);
     }
 }

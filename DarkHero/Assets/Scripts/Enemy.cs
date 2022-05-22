@@ -35,6 +35,7 @@ public class Enemy : MonoBehaviour
     //Trigger Damage to Enemy
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        
         if(collision.GetComponent<Hero>() is Hero && targetHero.isAttack)
         {
             ReciveDamage(targetHero.damage);
