@@ -5,22 +5,21 @@ using UnityEngine;
 
 public class WaveSpawner : MonoBehaviour
 {
+    //не работает 1 волна
     [SerializeField] private Waves[] _waves;
+    [SerializeField] private Hero _target;
+    [SerializeField] private WaveProgress _waveProgress;
     private int _currentEnemyIndex;
     private int _currentWaveIndex;
     private int _enemiesLeftToSpawn;
     private float _randX;
     private float _randY;
 
-
-    private void Awake()
-    {
-        _enemiesLeftToSpawn = _waves[0].WaveSettings.Length;
-
-    }
-
     private void Start()
     {
+        Debug.Log(_waves[0].WaveSettings);
+        _enemiesLeftToSpawn = _waves[0].WaveSettings.Length;
+        _waveProgress.Init(_enemiesLeftToSpawn);
         LaunchWave();
     }
 
@@ -30,12 +29,11 @@ public class WaveSpawner : MonoBehaviour
         _randY = UnityEngine.Random.Range(-4.60f, 4.60f);
         if (_enemiesLeftToSpawn > 0)
         {
-            yield return new WaitForSeconds(_waves[_currentWaveIndex]
-                .WaveSettings[_currentEnemyIndex]
-                .SpawnDelay);
-            Instantiate(_waves[_currentWaveIndex]
-                .WaveSettings[_currentEnemyIndex].Enemy,
-                new Vector2(_randX,_randY), Quaternion.identity);
+            yield return new WaitForSeconds(_waves[_currentWaveIndex].WaveSettings[_currentEnemyIndex].SpawnDelay);
+            Enemy enemy = Instantiate(_waves[_currentWaveIndex].WaveSettings[_currentEnemyIndex].Enemy, new Vector2(_randX,_randY), Quaternion.identity).GetComponent<Enemy>();
+            enemy.Init(_target);
+            enemy.Dying+=OnEnemyDying;
+            _waveProgress.SetEnemy(enemy);
             _enemiesLeftToSpawn--;
             _currentEnemyIndex++;
             StartCoroutine(SpawnEnemyInWave());
@@ -45,13 +43,23 @@ public class WaveSpawner : MonoBehaviour
             StopCoroutine(SpawnEnemyInWave());
         }
     }
+
+    private void OnEnemyDying(Enemy enemy)
+    {
+        enemy.Dying -= OnEnemyDying;
+
+    }
+
     private void Update()
     {
-        if (_currentWaveIndex < _waves.Length - 1 && FindObjectsOfType<Enemy>().Length <= 0 && _enemiesLeftToSpawn<=0)
+        enabled = true;
+        if (_currentWaveIndex < _waves.Length - 1 && FindObjectsOfType<Enemy>().Length <= 0 && _enemiesLeftToSpawn <= 0)
         {
             _currentWaveIndex++;
             _enemiesLeftToSpawn = _waves[_currentWaveIndex].WaveSettings.Length;
             _currentEnemyIndex = 0;
+            _waveProgress.ResetWave();
+            _waveProgress.Init(_enemiesLeftToSpawn);
             LaunchWave();
         }
     }
@@ -72,8 +80,6 @@ public class WaveSettings
 {
     [SerializeField] private GameObject _enemy;
     public GameObject Enemy { get => _enemy; }
-    //[SerializeField] private GameObject _neededSpawner;
-    //public GameObject NeededSpawner { get => _neededSpawner; }
     [SerializeField] private float _spawnDelay;
     public float SpawnDelay { get => _spawnDelay; }
 }

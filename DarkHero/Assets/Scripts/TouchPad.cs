@@ -11,6 +11,7 @@ public class TouchPad : MonoBehaviour, IEndDragHandler, IPointerDownHandler, IDr
     private Vector2 _directionTouch;
     public Hero hero;
     private Rigidbody2D _heroRigidbody2D;
+    private float _offRotation = 90f;
     public bool isDragging { get; private set; }
     private bool isTouch;
 
@@ -25,7 +26,10 @@ public class TouchPad : MonoBehaviour, IEndDragHandler, IPointerDownHandler, IDr
     {
         if (_heroRigidbody2D.velocity.magnitude <= 1)
         {
+            hero.GetComponent<Animator>().ResetTrigger("isAttack");
+
             hero.isAttack = false;
+            _heroRigidbody2D.rotation = 0;
             //_heroRigidbody2D.velocity = Vector2.zero;
         }
     }
@@ -35,13 +39,14 @@ public class TouchPad : MonoBehaviour, IEndDragHandler, IPointerDownHandler, IDr
         isDragging = true;
         Vector2 curentPosition = eventData.position;
         Vector2 directionRaw = curentPosition - _origin;
-        _directionDrag = directionRaw.normalized;
+        _directionDrag = directionRaw;
     }
 
     private void FixedUpdate()
     {
         if (isDragging)
             Moove(GetDirectionDrag());
+
     }
     public void OnEndDrag(PointerEventData eventData)
     {
@@ -65,7 +70,6 @@ public class TouchPad : MonoBehaviour, IEndDragHandler, IPointerDownHandler, IDr
         _directionTouch = Vector2.zero;
         _origin = eventData.position;
         _directionTouch =  Camera.main.ScreenToWorldPoint(Input.touches[0].position);
-
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -80,26 +84,43 @@ public class TouchPad : MonoBehaviour, IEndDragHandler, IPointerDownHandler, IDr
     }
     public void Moove(Vector2 dir)
     {
-        Rotation(dir);
-        _heroRigidbody2D.AddForce(dir * hero.speed * Time.fixedDeltaTime, ForceMode2D.Impulse);
+
+        var lookDir = dir - _heroRigidbody2D.position;
+        float angel = Mathf.Atan2(lookDir.normalized.y, lookDir.normalized.x) * Mathf.Rad2Deg + _offRotation;
+        _heroRigidbody2D.rotation = angel;
+        dir = dir.normalized;
+        _heroRigidbody2D.MovePosition(_heroRigidbody2D.position + dir * hero.speed * Time.fixedDeltaTime);
+
     }
 
     public void Attac(Vector3 dir)
     {
+        hero.GetComponent<Animator>().SetTrigger("isAttack");
+        var lookDir = GetDirectionTouch() - _heroRigidbody2D.position;
+        float angel = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg + _offRotation;
+        _heroRigidbody2D.rotation = angel;
         var direction = dir - hero.transform.position;
-        _heroRigidbody2D.AddForce(direction.normalized * hero.distanceAtack, ForceMode2D.Impulse);
+        direction = direction.normalized;
+        var pa = CheckDistanceAttack(hero.distanceAtack, direction);
+        _heroRigidbody2D.AddForce(direction * pa, ForceMode2D.Impulse);
     }
 
-    private float _speedRotate = 5f;
-    public int rotationOffset = -90;
-    private float rotZ;
-
-    private void Rotation(Vector3 dir)
+    private float CheckDistanceAttack(float powerAttack, Vector2 dir)
     {
-        Vector3 difference = dir - transform.position;
-        rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
 
-        Quaternion rotation = Quaternion.AngleAxis(rotZ + rotationOffset, Vector3.forward);
-        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * _speedRotate);
+        for (int i = 0; i < 20; i++)
+        {
+            Vector2 qw = dir * powerAttack;
+            if (qw.magnitude < 20)
+            {
+                powerAttack +=250;
+            }
+            else if (qw.magnitude > 25)
+            {
+                powerAttack -= 100;
+
+            }
+        }
+        return powerAttack;
     }
 }

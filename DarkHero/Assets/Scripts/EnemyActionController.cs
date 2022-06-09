@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class EnemyActionController : MonoBehaviour
 {
-    //TODO: fix retreat shooter
     private Enemy _thisEnemy;
     private Rigidbody2D _rigidbody2D;
 
@@ -35,25 +34,22 @@ public class EnemyActionController : MonoBehaviour
 
     private void Move(int speed)
     {
-        var direction = _thisEnemy.targetHero.transform.position - transform.position;
+        var direction = _thisEnemy.Target.transform.position - transform.position;
         _rigidbody2D.AddForce(direction.normalized * speed * Time.deltaTime, ForceMode2D.Impulse);
     }
     private void DistanceCalculation()
     {
-        _distanceToPlayer = Vector2.Distance(transform.position, _thisEnemy.targetHero.transform.position);
+        _distanceToPlayer = Vector2.Distance(transform.position, _thisEnemy.Target.transform.position);
     }
 
     private void FixedUpdate()
     {
         Rotation();
+
         if (_distanceToPlayer > _thisEnemy._attackRange && !_isAttack)
         {
             Move(_thisEnemy.speed);
         }
-        //else if(_distanceToPlayer < _thisEnemy._attackRange && _thisEnemy.isShooter && !_isAttack)
-        //{
-        //    Move(-_thisEnemy.speed);
-        //}
         else if(_distanceToPlayer < _thisEnemy._attackRange)
         {
             if (_timeBtwShots <= 0)
@@ -79,7 +75,7 @@ public class EnemyActionController : MonoBehaviour
     {
         if (!_thisEnemy.isShooter)
         {
-            var direction = _thisEnemy.targetHero.transform.position - transform.position;
+            var direction = _thisEnemy.Target.transform.position - transform.position;
             _rigidbody2D.AddForce(direction.normalized * _thisEnemy._attackVelocity, ForceMode2D.Impulse);
         }
         else if (_thisEnemy.isShooter)
@@ -99,9 +95,8 @@ public class EnemyActionController : MonoBehaviour
 
     private void Rotation()
     {
-        Vector3 difference = _thisEnemy.targetHero.transform.position - transform.position;
+        Vector3 difference = _thisEnemy.Target.transform.position - transform.position;
         rotZ = Mathf.Atan2 (difference.y, difference.x)* Mathf.Rad2Deg;
-
         Quaternion rotation = Quaternion.AngleAxis(rotZ + rotationOffset, Vector3.forward);
         transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime* _speedRotate);
     }

@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+
 
 public class Hero : MonoBehaviour
 {
@@ -10,12 +12,8 @@ public class Hero : MonoBehaviour
     [SerializeField] public int health;
     [SerializeField] public int damage;
     [SerializeField] public int speed;
+    [SerializeField] private Heart HeartUI;
 
-
-    void Update()
-    {
-      
-    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -30,6 +28,7 @@ public class Hero : MonoBehaviour
     }
     public void ReciveDamage()
     {
+        HeartUI.RemooveHeart();
         health--;
         if (health <= 0)
             Die();

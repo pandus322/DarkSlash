@@ -76,10 +76,10 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 0.9048885, b: 0, a: 1}
-  m_FlipX: 0
+  m_SortingOrder: 3
+  m_Sprite: {fileID: 350939056, guid: 41d7cd1c60c912b4caedd3a773ff4280, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 1, y: 1}
@@ -100,13 +100,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3fd8cff340b63041916d1016dbca36f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attackVelocity: 20
-  _attackRange: 3
-  speed: 10
+  IsPrepairAttack: 0
+  _attackVelocity: 400
+  _attackRange: 6
+  speed: 121
   health: 1
   damage: 1
+  chanceDrop: 30
+  drop: {fileID: 8595241844913663111, guid: db2836f6eb84c38488898ae2d9098724, type: 3}
   isShooter: 0
-  targetHero: {fileID: 0}
+  _target: {fileID: 0}
 --- !u!114 &1464529030919038831
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -154,14 +157,14 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 1.4166666, y: 1.3333334}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
