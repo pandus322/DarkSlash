@@ -9,6 +9,7 @@ public class WaveSpawner : MonoBehaviour
     [SerializeField] private Waves[] _waves;
     [SerializeField] private Hero _target;
     [SerializeField] private WaveProgress _waveProgress;
+    [SerializeField] private KillCount _killCount;
     private int _currentEnemyIndex;
     private int _currentWaveIndex;
     private int _enemiesLeftToSpawn;
@@ -46,6 +47,7 @@ public class WaveSpawner : MonoBehaviour
 
     private void OnEnemyDying(Enemy enemy)
     {
+        _killCount.AddKill();
         enemy.Dying -= OnEnemyDying;
 
     }

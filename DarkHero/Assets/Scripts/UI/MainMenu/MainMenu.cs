@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
+
 
 public class MainMenu : MonoBehaviour
 {
@@ -9,5 +12,10 @@ public class MainMenu : MonoBehaviour
     public void OnClickShopButton()
     {
         _shopPanel.SetActive(true);
+    }
+
+    public void OnClickPlayButton()
+    {
+        SceneManager.LoadScene(1);
     }
 }

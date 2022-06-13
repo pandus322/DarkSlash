@@ -7093,6 +7093,7 @@ GameObject:
   - component: {fileID: 453780216}
   - component: {fileID: 453780215}
   - component: {fileID: 453780214}
+  - component: {fileID: 453780218}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -7200,6 +7201,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 453780212}
   m_CullTransparentMesh: 1
+--- !u!114 &453780218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 453780212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a50c3b621ffe0e47b066202dd9ab3ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _killText: {fileID: 865001641}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -8330,6 +8344,10 @@ PrefabInstance:
       propertyPath: _target
       value: 
       objectReference: {fileID: 2133301795}
+    - target: {fileID: 3940186371896157867, guid: 3625c6b6c69e49c48bc42358b47f0934, type: 3}
+      propertyPath: _killCount
+      value: 
+      objectReference: {fileID: 453780218}
     - target: {fileID: 3940186371896157867, guid: 3625c6b6c69e49c48bc42358b47f0934, type: 3}
       propertyPath: _waveProgress
       value: 
