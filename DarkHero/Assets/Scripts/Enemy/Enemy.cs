@@ -1,30 +1,27 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class Enemy : MonoBehaviour
 {
-    public bool IsPrepairAttack;
+    public bool IsAttack;
     public int _attackVelocity;
     public float _attackRange;
     public int speed;
     public int health;
     public int damage;
     public int chanceDrop;
-    public GameObject drop;
-
+    [SerializeField] private List<DropGoods> _goodsList;
+    [SerializeField] private List<int> _chanceDropList;
     public event UnityAction<Enemy> Dying;
+    [SerializeField] private GameObject _bloodParticle;
+    public bool isDead;
 
 
 
     public bool isShooter;
     [SerializeField] private Hero _target;
     public Hero Target => _target;
-
-    private void Awake()
-    {
-        _target = FindObjectOfType<Hero>();
-
-    }
 
     public void Init(Hero target)
     {
@@ -41,9 +38,13 @@ public class Enemy : MonoBehaviour
     }
     public void Die()
     {
+        GetComponent<EnemyActionController>().enabled = false;
+        isDead = true;
         Dying?.Invoke(this);
-        Drop();
-        Destroy(gameObject);
+        GetComponent<Animator>().SetTrigger("IsDie");
+        DropChance();
+        Destroy(Instantiate(_bloodParticle, transform), 1);
+        Destroy(gameObject,2);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -51,16 +52,34 @@ public class Enemy : MonoBehaviour
         
         if(collision.GetComponent<Hero>() is Hero && _target.isAttack)
         {
-            ReciveDamage(_target.damage);
+            ReciveDamage(_target.Damage);
         }
     }
 
-    private void Drop()
+    private void DropChance()
     {
-        int chance = Random.Range(0, 31);
-        if(chance < chanceDrop)
+        int chance = Random.Range(0, 10*_chanceDropList.Count+11);
+        for (int i = 0; i < _chanceDropList.Count; i++)
         {
-            Instantiate(drop, transform.position, Quaternion.identity);
+            if (i == 0)
+            {
+                if (chance <= _chanceDropList[i])
+                {
+                    if(_goodsList[i].Level>0)
+                        Drop(_goodsList[i].DropTamplate);
+                }
+            }
+            else if(chance > _chanceDropList[i-1] && chance <= _chanceDropList[i])
+            {
+                if (_goodsList[i].Level > 0)
+                    Drop(_goodsList[i].DropTamplate);
+            }
         }
+    }
+
+    private void Drop(GameObject dropTamplate)
+    {
+        var drop = Instantiate(dropTamplate, transform.position, Quaternion.identity).GetComponent<DropItem>();
+        drop.Init(_target);
     }
 }

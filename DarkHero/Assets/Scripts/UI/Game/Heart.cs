@@ -8,12 +8,10 @@ public class Heart : MonoBehaviour
     [SerializeField] private Goods _heart;
     [SerializeField] private GameObject _tamplate;
     [SerializeField] private GameObject _itemContainer;
-    [SerializeField] private Hero _hero;
     private List<Image> _heartList = new List<Image>();
     private void Start()
     {
-        Debug.Log(_heart.Level);
-        for (int i = 0; i <= _heart.Level; i++)
+        for (int i = 0; i < _heart.Level+1; i++)
         {
             _heartList.Add(Instantiate(_tamplate, _itemContainer.transform).GetComponent<Image>());
         }

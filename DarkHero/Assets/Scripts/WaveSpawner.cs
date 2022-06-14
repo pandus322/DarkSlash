@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class WaveSpawner : MonoBehaviour
 {
@@ -15,23 +17,24 @@ public class WaveSpawner : MonoBehaviour
     private int _enemiesLeftToSpawn;
     private float _randX;
     private float _randY;
+    public event UnityAction EndWave;
+    [SerializeField] private TMP_Text _waveText;
 
     private void Start()
     {
-        Debug.Log(_waves[0].WaveSettings);
         _enemiesLeftToSpawn = _waves[0].WaveSettings.Length;
         _waveProgress.Init(_enemiesLeftToSpawn);
+        _waveText.text = $"Волна: {_currentWaveIndex+1}";
         LaunchWave();
     }
-
-    private IEnumerator SpawnEnemyInWave()
+        private IEnumerator SpawnEnemyInWave()
     {
         _randX = UnityEngine.Random.Range(-8.55f, 8.55f);
         _randY = UnityEngine.Random.Range(-4.60f, 4.60f);
         if (_enemiesLeftToSpawn > 0)
         {
             yield return new WaitForSeconds(_waves[_currentWaveIndex].WaveSettings[_currentEnemyIndex].SpawnDelay);
-            Enemy enemy = Instantiate(_waves[_currentWaveIndex].WaveSettings[_currentEnemyIndex].Enemy, new Vector2(_randX,_randY), Quaternion.identity).GetComponent<Enemy>();
+            Enemy enemy = Instantiate(_waves[_currentWaveIndex].WaveSettings[_currentEnemyIndex].Enemy, new Vector2(_randX,_randY),Quaternion.identity,transform).GetComponent<Enemy>();
             enemy.Init(_target);
             enemy.Dying+=OnEnemyDying;
             _waveProgress.SetEnemy(enemy);
@@ -54,15 +57,19 @@ public class WaveSpawner : MonoBehaviour
 
     private void Update()
     {
-        enabled = true;
         if (_currentWaveIndex < _waves.Length - 1 && FindObjectsOfType<Enemy>().Length <= 0 && _enemiesLeftToSpawn <= 0)
         {
             _currentWaveIndex++;
+            _waveText.text = $"Волна: {_currentWaveIndex+1}";
             _enemiesLeftToSpawn = _waves[_currentWaveIndex].WaveSettings.Length;
             _currentEnemyIndex = 0;
             _waveProgress.ResetWave();
             _waveProgress.Init(_enemiesLeftToSpawn);
             LaunchWave();
+        }
+        if (_currentWaveIndex == _waves.Length-1 && _enemiesLeftToSpawn == 0 && FindObjectsOfType<Enemy>().Length <= 0)
+        {
+            EndWave?.Invoke();
         }
     }
 

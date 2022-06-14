@@ -11,6 +11,12 @@ public class Wallet : ScriptableObject
     public int Soul => _soul;
 
     public event UnityAction SoulChange;
+    private void Awake()
+    {
+        if (PlayerPrefs.HasKey("Soul"))
+            _soul = PlayerPrefs.GetInt("Soul");
+        
+    }
 
     public void Pay(int price)
     {
@@ -20,6 +26,8 @@ public class Wallet : ScriptableObject
     public void AddSoul()
     {
         _soul++;
+        PlayerPrefs.SetInt("Soul", _soul);
+        PlayerPrefs.Save();
         SoulChange?.Invoke();
 
     }
